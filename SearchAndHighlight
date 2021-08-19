@@ -1,0 +1,62 @@
+'=====================================================================================
+'This macro searches a specific value in a specific column in a specific sheet, and
+'highlights the entire row of the cell that has a match.
+'Users will use a helper worksheet where they can specify what text to search, which
+'sheet to search and which colum of the sheet to search
+'***** The helper worksheet format ******
+'   Column 1: The names of the target sheets (the sheet where search is performed)
+'   Column 2: The text to search in the corresponding sheet specified in column 1
+'   Column 3: The name the column where search should be performed
+'##########################################################################
+'To run the macro, create a helper sheet in the above format and highlight
+'the cells you want to search in column 2
+'##########################################################################
+'***** Some Requirments *****
+'1. The column names of the target sheet must be unique.
+'2. Currently it assumes that Row2 of the target sheet stores its column names
+'=====================================================================================
+Public Sub SearchAndHighlight()
+Dim Helper As Worksheet
+Set Helper = ActiveWorkbook.ActiveSheet
+
+Dim rng As Range
+Dim SearchValueRange As Range
+Dim SearchSheetIndex As String
+Dim SearchColName As String
+Dim SearchColIndex As Integer
+Dim SearchAreaRange As Range
+Dim cell As Range
+
+' 1. Define a region where the search values comes from
+' 2. In the loop
+'   1) Assign the search value with each cell value in the search region
+'   2) Find the sheet name and the column name where the search should be performed
+'   3) Do the search and highlighting in an inner loop where it loop through each cell
+'      of the selected column
+Set SearchValueRange = Selection
+For Each cell In SearchValueRange.Cells
+    SearchSheetIndex = cell.Offset(0, -1).Text 'move 2 cells to the left to find which sheet to search
+    SearchColName = cell.Offset(0, 1).Text 'move 1 cells to the right to find which column to search
+    SearchValue = cell.Value
+    Worksheets(SearchSheetIndex).Activate
+    SearchColIndex = ActiveSheet.Rows(2).Find(SearchColName).Column
+    ' a. Define a region where the search should be performed
+    ' b. Do the search in a loop
+    ' c. Highlight each of the matched cell
+    Set SearchAreaRange = ActiveSheet.Columns(SearchColIndex)
+    With SearchAreaRange
+        Set rng = .Cells.Find(What:=SearchValue)
+        If Not rng Is Nothing Then
+            firstMatch = rng.Address
+            Do
+                rng.EntireRow.Interior.ColorIndex = 6  'highlight the entire row
+                'rng.Interior.ColorIndex = 6 'highlight cell only
+                Set rng = .FindNext(rng) 'continue searching with the same condition
+            Loop While rng.Address <> firstMatch
+        End If
+    End With
+    Set rng = Nothing
+   
+Next cell
+
+End Sub
