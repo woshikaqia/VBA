@@ -1,0 +1,15 @@
+Sub Text2Number()
+'Convert numbers stored as text to numbers in the selected range
+'It's a workaround approach using text to column, which does
+'the trick and won't affect the other cells that don't need any convertion
+
+Dim rng As Range
+
+For i = 1 To Selection.Columns.Count
+    Set rng = Selection.Columns(i)
+    rng.TextToColumns DataType:=xlDelimited, _
+    TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=True, _
+    Semicolon:=False, Comma:=False, Space:=False, Other:=False, FieldInfo _
+    :=Array(1, 1), TrailingMinusNumbers:=True
+Next
+End Sub
