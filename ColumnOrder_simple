@@ -1,0 +1,28 @@
+'This is simple macro to bring certain columns user specifed to the very left of a sheet.
+'This only works for one sheet at a time.
+'Modify the values in "colOrdr" in this macro to specify the column names
+
+Sub ColumnOrder_simple()
+Dim search As Range
+Dim cnt As Integer
+Dim colOrdr As Variant
+Dim indx As Integer
+
+colOrdr = Array("ScorePoints", "Model", "StdDev") 'define column order with header names here
+
+cnt = 1
+
+
+For indx = LBound(colOrdr) To UBound(colOrdr)
+    Set search = ActiveSheet.Rows("2:2").Find(colOrdr(indx), LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByColumns, SearchDirection:=xlNext, MatchCase:=False)
+    If Not search Is Nothing Then
+        If search.Column <> cnt Then
+            search.EntireColumn.Cut
+            Columns(cnt).Insert Shift:=xlToRight
+            Application.CutCopyMode = False
+        End If
+    cnt = cnt + 1
+    End If
+Next indx
+
+End Sub
