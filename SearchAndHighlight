@@ -9,19 +9,17 @@
 '   Column 3: The name the column where search should be performed
 '##########################################################################
 'To run the macro, create a helper sheet in the above format and highlight
-'the cells you want to search in column 2
+'the cells (i.e., sheet names) you want to search in Column 2
 '##########################################################################
 '***** Some Requirments *****
 '1. The column names of the target sheet must be unique.
 '2. Currently it assumes that Row2 of the target sheet stores its column names
 '=====================================================================================
 Public Sub SearchAndHighlight()
-Dim Helper As Worksheet
-Set Helper = ActiveWorkbook.ActiveSheet
 
 Dim rng As Range
 Dim SearchValueRange As Range
-Dim SearchSheetIndex As String
+Dim SearchSheetName As String
 Dim SearchColName As String
 Dim SearchColIndex As Integer
 Dim SearchAreaRange As Range
@@ -35,10 +33,10 @@ Dim cell As Range
 '      of the selected column
 Set SearchValueRange = Selection
 For Each cell In SearchValueRange.Cells
-    SearchSheetIndex = cell.Offset(0, -1).Text 'move 2 cells to the left to find which sheet to search
-    SearchColName = cell.Offset(0, 1).Text 'move 1 cells to the right to find which column to search
+    SearchSheetName = cell.Offset(0, -1).Text 'move 1 cell to the left to find which sheet to search
+    SearchColName = cell.Offset(0, 1).Text 'move 1 cell to the right to find which column to search
     SearchValue = cell.Value
-    Worksheets(SearchSheetIndex).Activate
+    Worksheets(SearchSheetName).Activate
     SearchColIndex = ActiveSheet.Rows(2).Find(SearchColName).Column
     ' a. Define a region where the search should be performed
     ' b. Do the search in a loop
