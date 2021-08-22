@@ -1,0 +1,50 @@
+'=====================================================================================
+'This macro performs reordering of the columns based on users perference for each sheet.
+'Users will use a helper worksheet where they can specify what are the sheets they want to
+'perform the reorder, in each sheet what columns they want to bring to the very left,
+'and in what order
+'***** The helper worksheet format ******
+'   Column 1: The names of the target sheets (i.e., the sheets you want to perform the reorder)
+'   Column 2,3,4...: For each target sheet (i.e., each Row), Column 2,3,4,... are the names
+'                    of the columns you want to bring to the very left in that sheet.
+'#############################################################################
+'To run the macro, create a helper sheet in the above format and highlight
+'the cells (i.e., sheet names) you want to perform the reorder in Column 1
+'#############################################################################
+'***** Some Requirments *****
+'1. The column names of the target sheet must be unique.
+'2. Currently it assumes that Row2 of the target sheet stores its column names
+'=====================================================================================
+
+Sub ColumnOrder()
+    Dim OrderSheetName As String
+    Dim colOrdr As Variant
+    Dim cnt As Integer
+    Dim indx As Integer
+    Dim cell As Range
+    Dim rng As Range
+    Dim search As Range
+  
+    For Each cell In Selection.Cells
+        OrderSheetName = cell.Text 'which sheet to order
+        col_start = cell.Offset(0, 1).Column   'column index of the first col name
+        col_end = cell.End(xlToRight).Column 'column index of the last col name
+        Set rng = Range(Cells(cell.Row, col_start), Cells(cell.Row, col_end))
+        colOrdr = rng  'define column order with col names here; NOTE: this creates a 2D array rather than 1D array
+        
+        cnt = 1
+        For indx = LBound(colOrdr, 2) To UBound(colOrdr, 2)
+            Set search = Worksheets(OrderSheetName).Rows("2:2").Find(colOrdr(1, indx), LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByColumns, SearchDirection:=xlNext, MatchCase:=False)
+            If Not search Is Nothing Then
+                If search.Column <> cnt Then
+                    search.EntireColumn.Cut
+                    Worksheets(OrderSheetName).Columns(cnt).Insert Shift:=xlToRight
+                    Application.CutCopyMode = False
+                End If
+            cnt = cnt + 1
+            End If
+        Next indx
+    Next cell
+
+End Sub
+
