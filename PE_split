@@ -1,0 +1,34 @@
+'=====================================================================================
+'This simple macro splits science contentlevel pulled from ITS (the lowest one) into
+'science discipline, DCI and PE.
+'
+' To use, cretea a new sheet, copy the content level column into column A, and run
+'=====================================================================================
+Sub PE_split()
+'
+' PE_split Macro
+'
+
+'
+    Columns("A:A").Select
+    Selection.TextToColumns Destination:=Range("A1"), DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=False, _
+        Semicolon:=False, Comma:=False, Space:=False, Other:=True, OtherChar _
+        :="|", FieldInfo:=Array(Array(1, 1), Array(2, 1), Array(3, 1)), _
+        TrailingMinusNumbers:=True
+    Range("D2").Select
+    ActiveCell.FormulaR1C1 = _
+        "=RIGHT(RC[-3],LEN(RC[-3])-SEARCH(""^^"",SUBSTITUTE(RC[-3],""-"",""^^"",LEN(RC[-3])-LEN(SUBSTITUTE(RC[-3],""-"","""")))))"
+    lastRow = ActiveSheet.Range("A" & Rows.Count).End(xlUp).Row
+    Range("D2").Select
+    Selection.AutoFill Destination:=Range("D2:D" & lastRow)
+    Range("D2:D" & lastRow).Select
+    Columns("B:C").Select
+    Selection.Copy
+    Columns("E:F").Select
+    ActiveSheet.Paste
+    Columns("B:C").Select
+    Application.CutCopyMode = False
+    Selection.ClearContents
+    Range("D2:F" & lastRow).Select
+End Sub
