@@ -1,0 +1,45 @@
+Public Sub Marcol1()
+Sheet4.Activate
+
+Dim rng As Range
+Dim SearchValueRange As Range
+Dim SearchAreaRange As Range
+Dim cell As Range
+
+' 1. Define a region where the search values comes from
+'   Either select a fixed region,
+'   Or use mouse to select a region
+' 2. Replace the search value with each cell value in the search region in a loop
+'Set SearchValueRange = Sheets(4).Range("A:B")
+Set SearchValueRange = Selection
+For Each cell In SearchValueRange.Cells
+    SearchValue = cell.Value
+
+    Sheets(1).Activate
+    ' 1. Define a region where the search should be performed
+    ' 2. Do the search in a loop
+    ' 3. Highlight each of the matched cell
+    Set SearchAreaRange = Sheets(1).UsedRange 'later can choose sheet dynamically in a loop
+    With SearchAreaRange
+    'With Sheets(1).Range("D:D")
+    'With Sheets(1).Range("A:D")
+    'With Sheets(1).Range("A2:D10")
+    'With Sheets(1).Range(Cells(2, 1), Cells(10, 4))
+        Set rng = .Cells.Find(What:=SearchValue)
+        If Not rng Is Nothing Then
+            firstMatch = rng.Address
+            Do
+                rng.Interior.ColorIndex = 37
+                Set rng = .FindNext(rng) 'continue searching with the same condition
+            Loop While rng.Address <> firstMatch
+        End If
+    End With
+    Set rng = Nothing
+    
+    'rownumber = rng.Row
+    'colnumber = rng.Column
+    'Sheets(1).Cells(2, 2).Value = rownumber
+Next cell
+
+End Sub
+
